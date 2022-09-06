@@ -1,0 +1,25 @@
+scalar DateTime
+
+type Query {
+    carByLicencePlate(licencePlate: ID!) : Car
+}
+
+type Car {
+    licencePlate: ID!
+    driver: Driver
+    description: String!
+}
+
+type Driver {
+    firstName: String!
+    lastName: String!
+    activePenaltyPoints: Int!
+    penalties: [DrivingFine!]!
+}
+
+type DrivingFine {
+    dateTime: DateTime!
+    violationType: String!
+    points: Int!
+    car: Car
+}

@@ -1,0 +1,24 @@
+plugins {
+	id 'org.springframework.boot'
+}
+
+dependencies {
+
+	implementation project(':api')
+	implementation project(':service')
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	implementation 'com.graphql-java:graphql-java:19.1'
+	implementation 'com.graphql-java:java-dataloader:3.2.0'
+	implementation 'com.graphql-java:graphql-java-extended-scalars:18.1'
+
+	implementation 'com.google.guava:guava:31.1-jre'
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.1'
+
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+}

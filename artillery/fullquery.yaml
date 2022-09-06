@@ -1,0 +1,39 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 60
+      arrivalRate: 20
+  plugins:
+    publish-metrics:
+      - type: prometheus
+        pushgateway: "http://localhost:9091"
+        tags:
+          - "type:fullquerytest"
+
+scenarios:
+  - name: "Query to retrieve all information"
+    flow:
+      - post:
+          url: "/graphql"
+          json:
+            query: |
+              query carByPlates($licencePlate: ID!){
+                carByLicencePlate(licencePlate: $licencePlate){
+                  description
+                  driver {
+                    firstName
+                    lastName
+                    penalties {
+                      points
+                      car {
+                        licencePlate
+                        description
+                      }
+                      violationType
+                    }
+                    activePenaltyPoints
+                  }
+                }
+              }
+            variables:
+              licencePlate: "{{ $randomString() }}"

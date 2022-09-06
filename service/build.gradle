@@ -1,0 +1,6 @@
+dependencies {
+
+    implementation project(':api')
+    implementation 'org.springframework:spring-context'
+
+}
