@@ -1,14 +1,14 @@
 config:
   target: "http://localhost:8080"
   phases:
-    - duration: 60
-      arrivalRate: 20
+    - duration: 120
+      arrivalRate: 15
   plugins:
     publish-metrics:
       - type: prometheus
         pushgateway: "http://localhost:9091"
         tags:
-          - "type:fullquerytest"
+          - "type:all-fields-scenario"
 
 scenarios:
   - name: "Query to retrieve all information"

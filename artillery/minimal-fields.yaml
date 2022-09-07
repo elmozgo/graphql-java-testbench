@@ -1,0 +1,30 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 120
+      arrivalRate: 35
+  plugins:
+    publish-metrics:
+      - type: prometheus
+        pushgateway: "http://localhost:9091"
+        tags:
+          - "type:minimal-fields-scenario"
+
+scenarios:
+  - name: "Query to retrieve minimal information"
+    flow:
+      - post:
+          url: "/graphql"
+          json:
+            query: |
+              query carByPlates($licencePlate: ID!){
+                carByLicencePlate(licencePlate: $licencePlate){
+                  description
+                  driver {
+                    firstName
+                    lastName
+                  }
+                }
+              }
+            variables:
+              licencePlate: "{{ $randomString() }}"
