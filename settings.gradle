@@ -1,6 +1,6 @@
 rootProject.name = 'graphqltestbench'
-//include 'webmvc'
 include 'blockingservlet'
 include 'api'
 include 'service'
+include 'asyncservlet'
 
