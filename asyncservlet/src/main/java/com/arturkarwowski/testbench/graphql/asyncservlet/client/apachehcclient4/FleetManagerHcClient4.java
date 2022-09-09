@@ -8,7 +8,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +24,7 @@ import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Component
 @Profile("apache-hc-client4")
@@ -31,10 +36,19 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper) {
-        this.httpAsyncClient = httpAsyncClientBuilder.build();
+    private final Executor executor;
+
+    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor executor) throws IOReactorException {
+
+        IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
+        ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
+        PoolingNHttpClientConnectionManager cm =
+                new PoolingNHttpClientConnectionManager(ioReactor);
+
+        this.httpAsyncClient = httpAsyncClientBuilder.setConnectionManager(cm).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
+        this.executor = executor;
         this.httpAsyncClient.start();
     }
 
@@ -51,8 +65,9 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
         request.setHeader("Content-Type", "application/json");
 
         return CompletableFuturisationUtils.toCompletableFuture(callback ->
-                httpAsyncClient.execute(request, callback))
+                        httpAsyncClient.execute(request, callback))
                 .thenApply(b -> {logger.debug("received response"); return b;})
+                .thenApplyAsync(b -> {logger.debug("back from the io thread pool to the async instrumented thread pool"); return b;}, executor)
                 .thenApply(HttpResponse::getEntity)
                 .thenApply(e -> Try.of(()-> objectMapper.readValue(e.getContent(), VehiclesResponse.class)).get());
     }

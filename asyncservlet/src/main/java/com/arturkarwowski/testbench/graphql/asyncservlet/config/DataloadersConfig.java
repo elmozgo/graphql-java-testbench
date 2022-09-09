@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,11 +17,15 @@ import java.util.stream.Collectors;
 public class DataloadersConfig {
 
     private final CarFacade carFacade;
+    private final CacheMap<String, Car> carCacheMap;
     private final DrivingFineFacade drivingFineFacade;
+    private final CacheMap<String, DrivingFine> drivingFineCacheMap;
 
-    public DataloadersConfig(CarFacade carFacade, DrivingFineFacade drivingFineFacade) {
+    public DataloadersConfig(CarFacade carFacade, CacheMap<String, Car> carCacheMap, DrivingFineFacade drivingFineFacade, CacheMap<String, DrivingFine> drivingFineCacheMap) {
         this.carFacade = carFacade;
+        this.carCacheMap = carCacheMap;
         this.drivingFineFacade = drivingFineFacade;
+        this.drivingFineCacheMap = drivingFineCacheMap;
     }
 
     @Bean
@@ -32,7 +35,9 @@ public class DataloadersConfig {
                 carFacade.getCars(licencePlates.stream().toList()).thenApply((cars) ->
                         cars.stream().collect(Collectors.toMap(Car::getLicencePlate, Function.identity())));
 
-        return DataLoaderFactory.newMappedDataLoader(carsBatchLoader);
+        var options = DataLoaderOptions.newOptions().setCacheMap(carCacheMap);
+
+        return DataLoaderFactory.newMappedDataLoader(carsBatchLoader, options);
     }
 
     @Bean
@@ -47,7 +52,9 @@ public class DataloadersConfig {
                             .toList());
         };
 
-        return DataLoaderFactory.newDataLoader(drivingFinesBatchLoader);
+        var options = DataLoaderOptions.newOptions().setCacheMap(drivingFineCacheMap);
+
+        return DataLoaderFactory.newDataLoader(drivingFinesBatchLoader, options);
     }
 
     @Bean
