@@ -1,7 +1,24 @@
 import express from 'express';
+import winston from 'winston';
 import crypto from 'crypto';
 import { LoremIpsum } from "lorem-ipsum";
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { app: 'downstream' },
+  transports: [
+    new winston.transports.Console()
+  ],
+});
+
+const extractTracing = (req) => {
+  return {
+    traceId: req.header('X-B3-TraceId'),
+    spanId: req.header('X-B3-SpanId')
+  }
+};
 
 const app = express();
 const port = 3000;
@@ -38,6 +55,10 @@ app.get('/fleet-manager/vehicles', (req, res) => {
     response.vehicles.push(createVehicle(req.query.licencePlate));
   }
 
+  logger.info(`fleet manager received request for ${response.vehicles.length} cars`,
+    { licencePlates: req.query.licencePlate },
+    extractTracing(req));
+
   //simulated delay
   setTimeout(() => {
     res.send(response);
@@ -46,6 +67,8 @@ app.get('/fleet-manager/vehicles', (req, res) => {
 });
 
 app.get('/hr-db/employees/:id', (req, res) => {
+
+  logger.info(`hr db received request for employee ${req.params.id}`, extractTracing(req));
 
   const config = {
     dictionaries: [names]
@@ -65,6 +88,8 @@ app.get('/hr-db/employees/:id', (req, res) => {
 });
 
 app.get('/police-register/driving-fines', (req, res) => {
+
+  logger.info(`police register received request for driving fines for employee ${req.query.driverId}`, extractTracing(req));
 
   const response = {
     driverId: crypto.randomUUID(),
