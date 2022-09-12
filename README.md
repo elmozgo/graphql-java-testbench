@@ -70,7 +70,7 @@ Other directories conain configuration for tools that are useful for testing
 ## impl status
 | implementation  | http client                   | traceability       |
 | --------------- | ----------------------------- | ------------------ |
-| blockingservlet | Feign (default - okhttp)      | ✔   Spring Sleuth |
+| blockingservlet | Feign (default)      | ✔   Spring Sleuth |
 | asyncservlet    | HttpClient (java11)           |                    |
 | asyncservlet    | HttpAsyncClient (Apache HC 4) | ✔  Spring Sleuth  |
 | asyncservlet    | Webclient                     | ✔  Spring Sleuth  |
