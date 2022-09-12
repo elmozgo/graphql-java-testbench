@@ -32,6 +32,21 @@ flowchart LR;
     graphql--"GET /employees/:id"-->hrdb;
     graphql--"GET /driving-fines"-->pr;
 ```
+## structure
+
+The servcie is structured as a multi module gradle project:
+
+- `graphqltestbench:api` - Graphql schema and exposed POJOs
+- `graphqltestbench:service` - the service or domain layer: business logic, dtos to map downstream services responses, etc. Things that can be shared in each of the  controller/application/graphql layer implementations.
+- `graphqltestbench:blockingservlet`, `graphqltestbench:asyncservlet` - different implementations of the graphql layer. These modules depend on the others and have a main executable class.
+
+Other directories conain configuration for tools that are useful for testing
+
+- `./downstream/` - a small node app - mocked implementation of the downstream service.
+- `./artillery/` - load testing scenarios
+- `./elk/` - docker compose config for an elk stack, is set up to consume logs from the service under test and the downsteam mock.
+- `./prometheus/` - docker compose config for Prometheus and Grafana. Automatically scrape metrics from the service under test. Can also visualise Artillery's test resuts. 
+
 ## setup
 
 ### requirements:
