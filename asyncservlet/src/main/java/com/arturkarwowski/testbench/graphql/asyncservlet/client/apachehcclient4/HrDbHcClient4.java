@@ -31,9 +31,9 @@ public class HrDbHcClient4 implements HrDbClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public HrDbHcClient4(@Value("${http.client.hr-db.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor executor) throws IOReactorException {
+    public HrDbHcClient4(@Value("${http.client.hr-db.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
         IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
         PoolingNHttpClientConnectionManager cm =
@@ -42,7 +42,7 @@ public class HrDbHcClient4 implements HrDbClient {
         this.httpAsyncClient = httpAsyncClientBuilder.setConnectionManager(cm).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
         this.httpAsyncClient.start();
     }
 
@@ -58,7 +58,7 @@ public class HrDbHcClient4 implements HrDbClient {
 
         return CompletableFuturisationUtils.toCompletableFuture(callback ->
                         httpAsyncClient.execute(request, callback))
-                .thenApplyAsync(HttpResponse::getEntity, executor)
+                .thenApplyAsync(HttpResponse::getEntity, tracingExecutor)
                 .thenApply(e -> Try.of(()-> objectMapper.readValue(e.getContent(), EmployeeDto.class)).get());
     }
 

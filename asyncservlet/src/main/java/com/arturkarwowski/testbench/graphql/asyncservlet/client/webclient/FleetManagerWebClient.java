@@ -24,12 +24,12 @@ public class FleetManagerWebClient implements FleetManagerClient {
 
     private final WebClient webClient;
     private final String baseUrl;
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public FleetManagerWebClient(WebClient webClient, @Value("${http.client.fleet-manager.url}") String baseUrl, Executor executor) {
+    public FleetManagerWebClient(WebClient webClient, @Value("${http.client.fleet-manager.url}") String baseUrl, Executor tracingExecutor) {
         this.webClient = webClient;
         this.baseUrl = baseUrl;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
     @Override
     public CompletableFuture<VehiclesResponse> getVehicles(List<String> licencePlates) {
@@ -45,6 +45,6 @@ public class FleetManagerWebClient implements FleetManagerClient {
                 .exchangeToMono(response -> response.bodyToMono(VehiclesResponse.class))
                 .toFuture()
                 .thenApply(r -> {logger.debug("got response"); return r;})
-                .thenApplyAsync(Function.identity(), executor);
+                .thenApplyAsync(Function.identity(), tracingExecutor);
     }
 }

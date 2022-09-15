@@ -24,10 +24,13 @@ public class PoliceRegisterHttpClient implements PoliceRegisterClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    public PoliceRegisterHttpClient(@Value("${http.client.police-register.url}") String baseUrl, Executor executor, ObjectMapper objectMapper) {
+    private final Executor tracingExecutor;
+
+    public PoliceRegisterHttpClient(@Value("${http.client.police-register.url}") String baseUrl, Executor executor, ObjectMapper objectMapper, Executor tracingExecutor) {
         this.httpClient = HttpClient.newBuilder().executor(executor).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class PoliceRegisterHttpClient implements PoliceRegisterClient {
                 .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
+                .thenApplyAsync(HttpResponse::body, tracingExecutor)
                 .thenApply(json -> Try.of(()-> objectMapper.readValue(json, TrafficViolationsResponse.class)).get());
     }
 }

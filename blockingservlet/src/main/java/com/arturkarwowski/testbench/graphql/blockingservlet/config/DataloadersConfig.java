@@ -23,12 +23,12 @@ public class DataloadersConfig {
 
     private final CarFacade carFacade;
     private final DrivingFineFacade drivingFineFacade;
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public DataloadersConfig(CarFacade carFacade, DrivingFineFacade drivingFineFacade, Executor executor) {
+    public DataloadersConfig(CarFacade carFacade, DrivingFineFacade drivingFineFacade, Executor tracingExecutor) {
         this.carFacade = carFacade;
         this.drivingFineFacade = drivingFineFacade;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Bean
@@ -39,7 +39,7 @@ public class DataloadersConfig {
             return CompletableFuture.supplyAsync(() -> {
                 var cars = carFacade.getCars(licencePlates.stream().toList());
                 return cars.stream().collect(Collectors.toMap(Car::getLicencePlate, Function.identity()));
-            }, executor);
+            }, tracingExecutor);
         };
 
         return DataLoaderFactory.newMappedDataLoader(carsBatchLoader);
@@ -51,7 +51,7 @@ public class DataloadersConfig {
 
         BatchLoader<String, List<DrivingFine>> drivingFinesBatchLoader = driverIds ->
                 CompletableFuture.supplyAsync(() ->
-                        driverIds.stream().map(drivingFineFacade::getDrivingFines).collect(Collectors.toList()), executor);
+                        driverIds.stream().map(drivingFineFacade::getDrivingFines).collect(Collectors.toList()), tracingExecutor);
 
         return DataLoaderFactory.newDataLoader(drivingFinesBatchLoader);
     }

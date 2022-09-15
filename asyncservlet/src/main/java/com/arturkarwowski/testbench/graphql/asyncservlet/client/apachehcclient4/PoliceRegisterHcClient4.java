@@ -31,9 +31,9 @@ public class PoliceRegisterHcClient4 implements PoliceRegisterClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public PoliceRegisterHcClient4(@Value("${http.client.police-register.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor executor) throws IOReactorException {
+    public PoliceRegisterHcClient4(@Value("${http.client.police-register.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
         IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
         PoolingNHttpClientConnectionManager cm =
@@ -42,7 +42,7 @@ public class PoliceRegisterHcClient4 implements PoliceRegisterClient {
         this.httpAsyncClient = httpAsyncClientBuilder.setConnectionManager(cm).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
 
         httpAsyncClient.start();
 
@@ -61,7 +61,7 @@ public class PoliceRegisterHcClient4 implements PoliceRegisterClient {
 
         return CompletableFuturisationUtils.toCompletableFuture(callback ->
                         httpAsyncClient.execute(request, callback))
-                .thenApplyAsync(HttpResponse::getEntity, executor)
+                .thenApplyAsync(HttpResponse::getEntity, tracingExecutor)
                 .thenApply(e -> Try.of(()-> objectMapper.readValue(e.getContent(), TrafficViolationsResponse.class)).get());
     }
 

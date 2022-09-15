@@ -21,12 +21,12 @@ public class PoliceRegisterWebClient implements PoliceRegisterClient {
 
     private final String baseUrl;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public PoliceRegisterWebClient(WebClient webClient, @Value("${http.client.police-register.url}") String baseUrl, Executor executor) {
+    public PoliceRegisterWebClient(WebClient webClient, @Value("${http.client.police-register.url}") String baseUrl, Executor tracingExecutor) {
         this.webClient = webClient;
         this.baseUrl = baseUrl;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class PoliceRegisterWebClient implements PoliceRegisterClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchangeToMono(response -> response.bodyToMono(TrafficViolationsResponse.class))
                 .toFuture()
-                .thenApplyAsync(Function.identity(), executor);
+                .thenApplyAsync(Function.identity(), tracingExecutor);
     }
 }

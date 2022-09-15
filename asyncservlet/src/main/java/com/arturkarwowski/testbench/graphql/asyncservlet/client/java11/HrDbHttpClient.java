@@ -28,13 +28,13 @@ public class HrDbHttpClient implements HrDbClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public HrDbHttpClient(@Value("${http.client.hr-db.url}") String baseUrl, Executor executor, ObjectMapper objectMapper) {
-        this.httpClient = HttpClient.newBuilder().executor(executor).build();
+    public HrDbHttpClient(@Value("${http.client.hr-db.url}") String baseUrl, Executor tracingExecutor, ObjectMapper objectMapper) {
+        this.httpClient = HttpClient.newBuilder().executor(tracingExecutor).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class HrDbHttpClient implements HrDbClient {
         logger.debug("about to fire a request");
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApplyAsync(HttpResponse::body, executor)
+                .thenApplyAsync(HttpResponse::body, tracingExecutor)
                 .thenApply(b -> {logger.debug("received response"); return b;})
                 .thenApply(json -> Try.of(()-> objectMapper.readValue(json, EmployeeDto.class)).get());
     }

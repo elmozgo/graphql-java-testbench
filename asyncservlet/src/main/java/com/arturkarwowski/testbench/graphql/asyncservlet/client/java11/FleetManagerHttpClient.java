@@ -24,13 +24,13 @@ public class FleetManagerHttpClient implements FleetManagerClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public FleetManagerHttpClient(@Value("${http.client.fleet-manager.url}") String baseUrl, Executor executor, ObjectMapper objectMapper) {
-        this.httpClient = HttpClient.newBuilder().executor(executor).build();
+    public FleetManagerHttpClient(@Value("${http.client.fleet-manager.url}") String baseUrl, Executor tracingExecutor, ObjectMapper objectMapper) {
+        this.httpClient = HttpClient.newBuilder().executor(tracingExecutor).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class FleetManagerHttpClient implements FleetManagerClient {
                 .build();
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApplyAsync(HttpResponse::body, executor)
+                .thenApplyAsync(HttpResponse::body, tracingExecutor)
                 .thenApply(json -> Try.of(()-> objectMapper.readValue(json, VehiclesResponse.class)).get());
     }
 }

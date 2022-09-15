@@ -24,12 +24,12 @@ public class HrDbWebClient implements HrDbClient {
     private final WebClient webClient;
     private final String baseUrl;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public HrDbWebClient(WebClient webClient, @Value("${http.client.hr-db.url}") String baseUrl, Executor executor) {
+    public HrDbWebClient(WebClient webClient, @Value("${http.client.hr-db.url}") String baseUrl, Executor tracingExecutor) {
         this.webClient = webClient;
         this.baseUrl = baseUrl;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
     }
 
     @Override
@@ -45,6 +45,6 @@ public class HrDbWebClient implements HrDbClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchangeToMono(response -> response.bodyToMono(EmployeeDto.class))
                 .toFuture()
-                .thenApplyAsync(Function.identity(), executor);
+                .thenApplyAsync(Function.identity(), tracingExecutor);
     }
 }

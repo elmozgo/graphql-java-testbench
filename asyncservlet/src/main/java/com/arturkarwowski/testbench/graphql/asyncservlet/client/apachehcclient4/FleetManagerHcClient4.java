@@ -36,9 +36,9 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
     private final String baseUrl;
     private final ObjectMapper objectMapper;
 
-    private final Executor executor;
+    private final Executor tracingExecutor;
 
-    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor executor) throws IOReactorException {
+    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
 
         IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
@@ -48,7 +48,7 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
         this.httpAsyncClient = httpAsyncClientBuilder.setConnectionManager(cm).build();
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.executor = executor;
+        this.tracingExecutor = tracingExecutor;
         this.httpAsyncClient.start();
     }
 
@@ -67,7 +67,7 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
         return CompletableFuturisationUtils.toCompletableFuture(callback ->
                         httpAsyncClient.execute(request, callback))
                 .thenApply(b -> {logger.debug("received response"); return b;})
-                .thenApplyAsync(b -> {logger.debug("back from the io thread pool to the async instrumented thread pool"); return b;}, executor)
+                .thenApplyAsync(b -> {logger.debug("back from the io thread pool to the async instrumented thread pool"); return b;}, tracingExecutor)
                 .thenApply(HttpResponse::getEntity)
                 .thenApply(e -> Try.of(()-> objectMapper.readValue(e.getContent(), VehiclesResponse.class)).get());
     }
