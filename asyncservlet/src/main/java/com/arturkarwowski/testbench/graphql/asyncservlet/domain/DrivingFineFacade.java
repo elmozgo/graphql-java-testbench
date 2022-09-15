@@ -18,12 +18,10 @@ public class DrivingFineFacade {
     private static final Logger logger = LoggerFactory.getLogger(DrivingFineFacade.class);
     private final PoliceRegisterClient policeRegisterClient;
     private final DrivingFineService drivingFineService;
-    private final Executor executor;
 
-    public DrivingFineFacade(PoliceRegisterClient policeRegisterClient, DrivingFineService drivingFineService, Executor executor) {
+    public DrivingFineFacade(PoliceRegisterClient policeRegisterClient, DrivingFineService drivingFineService) {
         this.policeRegisterClient = policeRegisterClient;
         this.drivingFineService = drivingFineService;
-        this.executor = executor;
     }
 
     public CompletableFuture<List<DrivingFine>> getDrivingFines(String driverId) {

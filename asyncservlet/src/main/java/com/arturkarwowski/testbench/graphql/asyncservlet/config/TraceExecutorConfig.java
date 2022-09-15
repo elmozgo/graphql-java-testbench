@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.cloud.sleuth.instrument.async.LazyTraceExecutor;
 import org.springframework.cloud.sleuth.instrument.async.LazyTraceThreadPoolTaskExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ import java.util.concurrent.Executor;
 @EnableAutoConfiguration
 @EnableAsync
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-public class TraceExecutorConfig extends AsyncConfigurerSupport {
+public class TraceExecutorConfig {
 
     private final BeanFactory beanFactory;
 
