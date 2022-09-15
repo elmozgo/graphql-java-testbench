@@ -68,9 +68,10 @@ Other directories conain configuration for tools that are useful for testing
 
 
 ## impl status
-| implementation  | http client                   | traceability       |
-| --------------- | ----------------------------- | ------------------ |
-| blockingservlet | Feign (default)      | ✔   Spring Sleuth |
-| asyncservlet    | HttpClient (java11)           |                    |
-| asyncservlet    | HttpAsyncClient (Apache HC 4) | ✔  Spring Sleuth  |
-| asyncservlet    | Webclient                     | ✔  Spring Sleuth  |
+| implementation  | command                                                                               | http client                   | notes                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| blockingservlet | `./gradlew :blockingservlet:bootRun`                                                  | Feign (default)               |                                                                                                                                                                              |
+| asyncservlet    | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=java11-httpclient'` | HttpClient (java11)           | no tracing instrumentation                                                                                                                                                   |
+| asyncservlet    | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=apache-hc-client4'` | HttpAsyncClient (Apache HC 4) |                                                                                                                                                                              |
+| asyncservlet    | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=webclient'`         | WebClient                     |                                                                                                                                                                              |
+| webflux         | `./gradlew :webflux:bootRun`                                                          | WebClient                     | graphql-java engine uses CompletableFutures internally and some translations to Mono/Flux are required. To avoid reinventing a well build wheel, Spring for Graphql is used. |
