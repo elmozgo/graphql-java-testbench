@@ -3,4 +3,5 @@ include 'blockingservlet'
 include 'api'
 include 'service'
 include 'asyncservlet'
+include 'webflux'
 
