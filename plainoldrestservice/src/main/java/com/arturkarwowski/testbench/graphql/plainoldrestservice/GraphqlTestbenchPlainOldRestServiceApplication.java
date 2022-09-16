@@ -1,0 +1,15 @@
+package com.arturkarwowski.testbench.graphql.plainoldrestservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication(scanBasePackages = {"com.arturkarwowski.testbench.graphql"})
+@EnableFeignClients
+public class GraphqlTestbenchPlainOldRestServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(GraphqlTestbenchPlainOldRestServiceApplication.class, args);
+	}
+
+}
