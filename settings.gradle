@@ -4,4 +4,5 @@ include 'api'
 include 'service'
 include 'asyncservlet'
 include 'webflux'
+include 'plainoldrestservice'
 
