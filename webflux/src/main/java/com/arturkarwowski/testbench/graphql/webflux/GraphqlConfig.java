@@ -17,10 +17,10 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 @Configuration(proxyBeanMethods = false)
 public class GraphqlConfig {
 
-    private final WiringConfig wiringConfig;
+    private final DataFetcherDefinitions dataFetcherDefinitions;
 
-    public GraphqlConfig(WiringConfig wiringConfig) {
-        this.wiringConfig = wiringConfig;
+    public GraphqlConfig(DataFetcherDefinitions dataFetcherDefinitions) {
+        this.dataFetcherDefinitions = dataFetcherDefinitions;
     }
 
     private PreparsedDocumentProvider buildPreparsedDocumentProvider() {
@@ -39,17 +39,17 @@ public class GraphqlConfig {
                         .preparsedDocumentProvider(buildPreparsedDocumentProvider()))
                 .configureRuntimeWiring(configurer -> configurer
                         .type(newTypeWiring("Query")
-                                .dataFetcher("carByLicencePlate", wiringConfig.carFetcher)
+                                .dataFetcher("carByLicencePlate", dataFetcherDefinitions.carFetcher)
                                 .build())
                         .type(newTypeWiring("Car")
-                                .dataFetcher("driver", wiringConfig.driverFetcher)
+                                .dataFetcher("driver", dataFetcherDefinitions.driverFetcher)
                                 .build())
                         .type(newTypeWiring("Driver")
-                                .dataFetcher("activePenaltyPoints", wiringConfig.activePenaltyPointsFetcher)
-                                .dataFetcher("penalties", wiringConfig.penaltiesFetcher)
+                                .dataFetcher("activePenaltyPoints", dataFetcherDefinitions.activePenaltyPointsFetcher)
+                                .dataFetcher("penalties", dataFetcherDefinitions.penaltiesFetcher)
                                 .build())
                         .type(newTypeWiring("DrivingFine")
-                                .dataFetcher("car", wiringConfig.drivingFineCarFetcher)
+                                .dataFetcher("car", dataFetcherDefinitions.drivingFineCarFetcher)
                                 .build())
                         .scalar(ExtendedScalars.DateTime)
                         .build())

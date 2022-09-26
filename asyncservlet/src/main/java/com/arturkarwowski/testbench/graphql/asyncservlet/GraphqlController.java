@@ -26,7 +26,6 @@ public class GraphqlController {
 
     private final DataLoaderRegistry dataLoaderRegistry;
 
-    @Autowired
     public GraphqlController(GraphQL graphql, ObjectMapper objectMapper, DataLoaderRegistry dataLoaderRegistry) {
         this.graphql = graphql;
         this.objectMapper = objectMapper;

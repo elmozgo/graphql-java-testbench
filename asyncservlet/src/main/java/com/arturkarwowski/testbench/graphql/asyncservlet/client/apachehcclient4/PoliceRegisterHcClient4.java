@@ -33,8 +33,11 @@ public class PoliceRegisterHcClient4 implements PoliceRegisterClient {
 
     private final Executor tracingExecutor;
 
-    public PoliceRegisterHcClient4(@Value("${http.client.police-register.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
-        IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
+    public PoliceRegisterHcClient4(@Value("${http.client.police-register.url}") String baseUrl,
+                                   HttpAsyncClientBuilder httpAsyncClientBuilder,
+                                   ObjectMapper objectMapper,
+                                   IOReactorConfig reactorConfig,
+                                   Executor tracingExecutor) throws IOReactorException {
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -43,8 +46,7 @@ public class PoliceRegisterHcClient4 implements PoliceRegisterClient {
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
         this.tracingExecutor = tracingExecutor;
-
-        httpAsyncClient.start();
+        this.httpAsyncClient.start();
 
     }
     @Override

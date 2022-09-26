@@ -1,8 +1,12 @@
 config:
   target: "http://localhost:8080"
   phases:
-    - duration: 240
-      arrivalRate: 25
+    - duration: 10
+      arrivalRate: 20
+      maxVusers: 190
+    - duration: 600
+      arrivalRate: 100
+      maxVusers: 190
   plugins:
     publish-metrics:
       - type: prometheus

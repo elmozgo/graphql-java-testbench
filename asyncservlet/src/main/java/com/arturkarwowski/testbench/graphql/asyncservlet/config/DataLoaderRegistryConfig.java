@@ -14,14 +14,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Configuration
-public class DataloadersConfig {
+public class DataLoaderRegistryConfig {
 
     private final CarFacade carFacade;
     private final CacheMap<String, Car> carCacheMap;
     private final DrivingFineFacade drivingFineFacade;
     private final CacheMap<String, DrivingFine> drivingFineCacheMap;
 
-    public DataloadersConfig(CarFacade carFacade, CacheMap<String, Car> carCacheMap, DrivingFineFacade drivingFineFacade, CacheMap<String, DrivingFine> drivingFineCacheMap) {
+    public DataLoaderRegistryConfig(CarFacade carFacade, CacheMap<String, Car> carCacheMap, DrivingFineFacade drivingFineFacade, CacheMap<String, DrivingFine> drivingFineCacheMap) {
         this.carFacade = carFacade;
         this.carCacheMap = carCacheMap;
         this.drivingFineFacade = drivingFineFacade;

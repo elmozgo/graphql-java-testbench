@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class WiringConfig {
+public class DataFetcherDefinitions {
 
     private DriverFacade driverFacade;
     private DrivingFineFacade drivingFineFacade;
 
-    public WiringConfig(DriverFacade driverFacade, DrivingFineFacade drivingFineFacade) {
+    public DataFetcherDefinitions(DriverFacade driverFacade, DrivingFineFacade drivingFineFacade) {
         this.driverFacade = driverFacade;
         this.drivingFineFacade = drivingFineFacade;
     }
@@ -32,13 +32,13 @@ public class WiringConfig {
         return Optional.ofNullable(futureCar.join());
     };
 
-    DataFetcher<Driver> driverFetcher = (environment) -> {
+    final DataFetcher<Driver> driverFetcher = (environment) -> {
 
         Car car = environment.getSource();
         return driverFacade.getDriver(car.getDriverId());
     };
 
-    DataFetcher<List<DrivingFine>> penaltiesFetcher = (environment) -> {
+    final DataFetcher<List<DrivingFine>> penaltiesFetcher = (environment) -> {
 
         Driver driver = environment.getSource();
         DataLoader<String, List<DrivingFine>> dataLoader = environment.getDataLoader("drivingFines");
@@ -47,7 +47,8 @@ public class WiringConfig {
         dataLoader.dispatch();
         return futureFines.join();
     };
-    DataFetcher<Integer> activePenaltyPointsFetcher = (environment) -> {
+
+    final DataFetcher<Integer> activePenaltyPointsFetcher = (environment) -> {
         Driver driver = environment.getSource();
         DataLoader<String, List<DrivingFine>> dataLoader = environment.getDataLoader("drivingFines");
 
@@ -56,7 +57,8 @@ public class WiringConfig {
         var drivingFines =  futureFines.join();
         return drivingFineFacade.getActivePenaltyPoints(drivingFines);
     };
-    DataFetcher<Optional<Car>> drivingFineCarFetcher = (environment) -> {
+
+    final DataFetcher<Optional<Car>> drivingFineCarFetcher = (environment) -> {
         DrivingFine drivingFine = environment.getSource();
         DataLoader<String, Car> dataLoader = environment.getDataLoader("cars");
 

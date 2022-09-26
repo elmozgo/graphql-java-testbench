@@ -5,10 +5,7 @@ import com.arturkarwowski.testbench.graphql.api.DrivingFine;
 import com.arturkarwowski.testbench.graphql.blockingservlet.domain.CarFacade;
 import com.arturkarwowski.testbench.graphql.blockingservlet.domain.DrivingFineFacade;
 import org.dataloader.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -16,24 +13,20 @@ import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.springframework.web.context.WebApplicationContext.SCOPE_REQUEST;
-
-@Configuration
-public class DataloadersConfig {
+@Component
+public class DataLoaderRegisterBuilder {
 
     private final CarFacade carFacade;
     private final DrivingFineFacade drivingFineFacade;
     private final Executor tracingExecutor;
 
-    public DataloadersConfig(CarFacade carFacade, DrivingFineFacade drivingFineFacade, Executor tracingExecutor) {
+    public DataLoaderRegisterBuilder(CarFacade carFacade, DrivingFineFacade drivingFineFacade, Executor tracingExecutor) {
         this.carFacade = carFacade;
         this.drivingFineFacade = drivingFineFacade;
         this.tracingExecutor = tracingExecutor;
     }
 
-    @Bean
-    @Scope(value = SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public DataLoader<String, Car> carsDataLoader() {
+    private DataLoader<String, Car> carsDataLoader() {
 
         MappedBatchLoader<String, Car> carsBatchLoader = licencePlates -> {
             return CompletableFuture.supplyAsync(() -> {
@@ -45,9 +38,7 @@ public class DataloadersConfig {
         return DataLoaderFactory.newMappedDataLoader(carsBatchLoader);
     }
 
-    @Bean
-    @Scope(value = SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public DataLoader<String, List<DrivingFine>> drivingFinesDataLoader() {
+    private DataLoader<String, List<DrivingFine>> drivingFinesDataLoader() {
 
         BatchLoader<String, List<DrivingFine>> drivingFinesBatchLoader = driverIds ->
                 CompletableFuture.supplyAsync(() ->
@@ -56,8 +47,7 @@ public class DataloadersConfig {
         return DataLoaderFactory.newDataLoader(drivingFinesBatchLoader);
     }
 
-    @Bean
-    public DataLoaderRegistry dataLoaderRegistry() {
+    public DataLoaderRegistry buildDataLoaderRegistry() {
         return new DataLoaderRegistry()
                 .register("cars", carsDataLoader())
                 .register("drivingFines", drivingFinesDataLoader());

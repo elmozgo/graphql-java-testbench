@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Configuration
-public class DataloadersConfig {
+public class BatchLoaderRegisterConfigurer {
 
     private final CarFacade carFacade;
     private final CacheMap<String, Car> carCacheMap;
@@ -25,7 +25,7 @@ public class DataloadersConfig {
 
     private final BatchLoaderRegistry batchLoaderRegistry;
 
-    public DataloadersConfig(CarFacade carFacade, CacheMap<String, Car> carCacheMap, DrivingFineFacade drivingFineFacade, CacheMap<String, DrivingFine> drivingFineCacheMap, BatchLoaderRegistry batchLoaderRegistry) {
+    public BatchLoaderRegisterConfigurer(CarFacade carFacade, CacheMap<String, Car> carCacheMap, DrivingFineFacade drivingFineFacade, CacheMap<String, DrivingFine> drivingFineCacheMap, BatchLoaderRegistry batchLoaderRegistry) {
         this.carFacade = carFacade;
         this.carCacheMap = carCacheMap;
         this.drivingFineFacade = drivingFineFacade;

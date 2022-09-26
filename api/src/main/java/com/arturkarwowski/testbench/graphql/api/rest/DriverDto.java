@@ -1,7 +1,6 @@
 package com.arturkarwowski.testbench.graphql.api.rest;
 
 import com.arturkarwowski.testbench.graphql.api.Driver;
-import com.arturkarwowski.testbench.graphql.api.DrivingFine;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.util.List;

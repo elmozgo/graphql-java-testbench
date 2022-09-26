@@ -33,8 +33,11 @@ public class HrDbHcClient4 implements HrDbClient {
 
     private final Executor tracingExecutor;
 
-    public HrDbHcClient4(@Value("${http.client.hr-db.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
-        IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
+    public HrDbHcClient4(@Value("${http.client.hr-db.url}") String baseUrl,
+                         HttpAsyncClientBuilder httpAsyncClientBuilder,
+                         ObjectMapper objectMapper,
+                         IOReactorConfig reactorConfig,
+                         Executor tracingExecutor) throws IOReactorException {
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);

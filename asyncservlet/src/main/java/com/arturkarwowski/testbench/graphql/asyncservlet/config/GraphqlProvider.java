@@ -21,13 +21,13 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
 @Component
 public class GraphqlProvider {
-    private final WiringConfig wiringConfig;
+    private final DataFetcherDefinitions dataFetcherDefinitions;
     private final String schemaSdl;
 
     private GraphQL graphQL;
 
-    public GraphqlProvider(WiringConfig wiringConfig, String schemaSdl) {
-        this.wiringConfig = wiringConfig;
+    public GraphqlProvider(DataFetcherDefinitions dataFetcherDefinitions, String schemaSdl) {
+        this.dataFetcherDefinitions = dataFetcherDefinitions;
         this.schemaSdl = schemaSdl;
     }
 
@@ -59,17 +59,17 @@ public class GraphqlProvider {
     private RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("Query")
-                        .dataFetcher("carByLicencePlate", wiringConfig.carFetcher)
+                        .dataFetcher("carByLicencePlate", dataFetcherDefinitions.carFetcher)
                         .build())
                 .type(newTypeWiring("Car")
-                        .dataFetcher("driver", wiringConfig.driverFetcher)
+                        .dataFetcher("driver", dataFetcherDefinitions.driverFetcher)
                         .build())
                 .type(newTypeWiring("Driver")
-                        .dataFetcher("activePenaltyPoints", wiringConfig.activePenaltyPointsFetcher)
-                        .dataFetcher("penalties", wiringConfig.penaltiesFetcher)
+                        .dataFetcher("activePenaltyPoints", dataFetcherDefinitions.activePenaltyPointsFetcher)
+                        .dataFetcher("penalties", dataFetcherDefinitions.penaltiesFetcher)
                         .build())
                 .type(newTypeWiring("DrivingFine")
-                        .dataFetcher("car", wiringConfig.drivingFineCarFetcher)
+                        .dataFetcher("car", dataFetcherDefinitions.drivingFineCarFetcher)
                         .build())
                 .scalar(ExtendedScalars.DateTime)
                 .build();

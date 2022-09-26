@@ -38,9 +38,13 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
 
     private final Executor tracingExecutor;
 
-    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl, HttpAsyncClientBuilder httpAsyncClientBuilder, ObjectMapper objectMapper, Executor tracingExecutor) throws IOReactorException {
+    public FleetManagerHcClient4(@Value("${http.client.fleet-manager.url}") String baseUrl,
+                                 HttpAsyncClientBuilder httpAsyncClientBuilder,
+                                 ObjectMapper objectMapper,
+                                 IOReactorConfig reactorConfig,
+                                 Executor tracingExecutor) throws IOReactorException {
 
-        IOReactorConfig reactorConfig = IOReactorConfig.custom().build();
+
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(reactorConfig);
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -66,10 +70,16 @@ public class FleetManagerHcClient4 implements FleetManagerClient {
 
         return CompletableFuturisationUtils.toCompletableFuture(callback ->
                         httpAsyncClient.execute(request, callback))
-                .thenApply(b -> {logger.debug("received response"); return b;})
-                .thenApplyAsync(b -> {logger.debug("back from the io thread pool to the async instrumented thread pool"); return b;}, tracingExecutor)
+                .thenApply(b -> {
+                    logger.debug("received response");
+                    return b;
+                })
+                .thenApplyAsync(b -> {
+                    logger.debug("back from the io thread pool to the async instrumented thread pool");
+                    return b;
+                }, tracingExecutor)
                 .thenApply(HttpResponse::getEntity)
-                .thenApply(e -> Try.of(()-> objectMapper.readValue(e.getContent(), VehiclesResponse.class)).get());
+                .thenApply(e -> Try.of(() -> objectMapper.readValue(e.getContent(), VehiclesResponse.class)).get());
     }
 
     @PreDestroy

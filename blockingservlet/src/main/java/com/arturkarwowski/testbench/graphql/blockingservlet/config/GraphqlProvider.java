@@ -3,10 +3,8 @@ package com.arturkarwowski.testbench.graphql.blockingservlet.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import graphql.GraphQL;
-import graphql.execution.AsyncExecutionStrategy;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
-import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
@@ -22,14 +20,15 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
 @Component
 public class GraphqlProvider {
-    private final WiringConfig wiringConfig;
     private final String schemaSdl;
+
+    private final RuntimeWiring runtimeWiring;
 
     private GraphQL graphQL;
 
-    public GraphqlProvider(WiringConfig wiringConfig, String schemaSdl) {
-        this.wiringConfig = wiringConfig;
+    public GraphqlProvider(String schemaSdl, RuntimeWiring runtimeWiring) {
         this.schemaSdl = schemaSdl;
+        this.runtimeWiring = runtimeWiring;
     }
 
     @PostConstruct
@@ -52,29 +51,10 @@ public class GraphqlProvider {
 
     private GraphQLSchema buildSchema(String sdl) {
         TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
-        RuntimeWiring runtimeWiring = buildWiring();
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
     }
 
-    private RuntimeWiring buildWiring() {
-        return RuntimeWiring.newRuntimeWiring()
-                .type(newTypeWiring("Query")
-                        .dataFetcher("carByLicencePlate", wiringConfig.carFetcher)
-                        .build())
-                .type(newTypeWiring("Car")
-                        .dataFetcher("driver", wiringConfig.driverFetcher)
-                        .build())
-                .type(newTypeWiring("Driver")
-                        .dataFetcher("activePenaltyPoints", wiringConfig.activePenaltyPointsFetcher)
-                        .dataFetcher("penalties", wiringConfig.penaltiesFetcher)
-                        .build())
-                .type(newTypeWiring("DrivingFine")
-                        .dataFetcher("car", wiringConfig.drivingFineCarFetcher)
-                        .build())
-                .scalar(ExtendedScalars.DateTime)
-                .build();
-    }
 
     @Bean
     public GraphQL graphQL() {

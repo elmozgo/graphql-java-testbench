@@ -1,11 +1,10 @@
 package com.arturkarwowski.testbench.graphql.blockingservlet;
 
+import com.arturkarwowski.testbench.graphql.blockingservlet.config.DataLoaderRegisterBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionInput;
 import graphql.GraphQL;
-import org.dataloader.DataLoaderRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +17,12 @@ public class GraphqlController {
 
     private final GraphQL graphql;
     private final ObjectMapper objectMapper;
-    private final DataLoaderRegistry dataLoaderRegistry;
+    private final DataLoaderRegisterBuilder dataLoaderRegisterBuilder;
 
-    @Autowired
-    public GraphqlController(GraphQL graphql, ObjectMapper objectMapper, DataLoaderRegistry dataLoaderRegistry) {
+    public GraphqlController(GraphQL graphql, ObjectMapper objectMapper, DataLoaderRegisterBuilder dataLoaderRegisterBuilder) {
         this.graphql = graphql;
         this.objectMapper = objectMapper;
-        this.dataLoaderRegistry = dataLoaderRegistry;
+        this.dataLoaderRegisterBuilder = dataLoaderRegisterBuilder;
     }
 
     @RequestMapping(value = "/graphql", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +57,7 @@ public class GraphqlController {
     private Map<String, Object> executeGraphqlQuery(String query, String operationName, Map<String, Object> variables) {
         ExecutionInput executionInput = ExecutionInput.newExecutionInput()
                 .query(query)
-                .dataLoaderRegistry(dataLoaderRegistry)
+                .dataLoaderRegistry(dataLoaderRegisterBuilder.buildDataLoaderRegistry())
                 .operationName(operationName)
                 .variables(variables)
                 .build();
