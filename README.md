@@ -53,27 +53,33 @@ Other directories conain configuration for tools that are useful for testing
 - to run the service: a `java 17 jdk` (with some small changes, the code should also compile to java 11)
 - to run mocked downstream services & load testing tools: `node` + `npm`
 - to run visualisation tools for logs and metrics: `docker` & `docker-compose`
+- *(optional)* to run "handy commands": `make`
 
-### installation:
-1. download dependencies of mocked downstream services:   
-`npm install ./downstream/index.js`
-1. start mocked downstream services (on port `3000`):  
-`node ./downstream/index.js`
-1. *optional:* install Artillery for load testing:   
-`npm install -g artillery`
-1. *optional:* launch ELK stack (Kibana on port `5601`):   
-`cd ./elk && docker-compose up`
-1. *optional:* launch Prometheus/Grafana (Grafana on port `3001`):   
-`cd ./prometheus && docker-compose up`
+### tools setup (optional):
+1. install Artillery for load testing:   
+    ```shell
+    npm install -g artillery
+    ```
+1. launch ELK stack (Kibana on port `5601`):   
+    ```shell
+    cd ./elk && docker-compose up
+    ```
+1. launch Prometheus/Grafana (Grafana on port `3001`):   
+    ```shell
+    cd ./prometheus && docker-compose up
+    ```
 
+## launching
 
-## impl status
-| implementation                                                | command                                                                               | http client                                        | notes                                                                                                                                                                            |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Blocking Spring MVC servlet with sequential fetcher execution | `./gradlew :blockingservlet:bootRun --args='--spring.profiles.active=sequential'`     | Feign (default), blocking                          |                                                                                                                                                                                  |
-| Blocking Spring MVC servlet with parallel fetcher execution   | `./gradlew :blockingservlet:bootRun --args='--spring.profiles.active=parallel'`       | Feign (default), blocking                          |                                                                                                                                                                                  |
-| Asyncronous Spring MVC servlet (java11's HTTP Client)         | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=java11-httpclient'` | HttpClient (java11), nonblocking                   | no tracing instrumentation                                                                                                                                                       |
-| Asyncronous Spring MVC servlet with blocking HTTP clients     | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=apache-hc-client4'` | HttpAsyncClient (Apache HC 4), blocking, but async |                                                                                                                                                                                  |
-| Asyncronous Spring MVC servlet (Spring's WebClient)           | `./gradlew :asyncservlet:bootRun --args='--spring.profiles.active=webclient'`         | WebClient, nonblocking                             |                                                                                                                                                                                  |
-| Spring Webflux                                                | `./gradlew :webflux:bootRun`                                                          | WebClient, nonblocking                             | graphql-java engine uses CompletableFutures internally and some translations to Mono/Flux are required. To avoid reinventing the (well build) wheel, Spring for Graphql is used. |
-| Blocking Spring MVC REST service                              | `./gradlew :plainoldrestservice:bootRun`                                              | Feign (default), blocking                          | plain, old, restful, thread-per-request spring boot web app that returns (almost) the same data.                                                                                 |
+1. Launch downstream services: `make run_downstream`
+1. Launch one of implementations:
+
+| implementation                                                | command                            | http client                                        | notes                                                                                                                                                                            |
+|---------------------------------------------------------------|------------------------------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Blocking Spring MVC servlet with sequential fetcher execution | `make run_blocking_seq`            | Feign (default), blocking                          |                                                                                                                                                                                  |
+| Blocking Spring MVC servlet with parallel fetcher execution   | `make run_blocking_par`            | Feign (default), blocking                          |                                                                                                                                                                                  |
+| Asyncronous Spring MVC servlet (java11's HTTP Client)         | `make run_async_java11`            | HttpClient (java11), nonblocking                   | no tracing instrumentation                                                                                                                                                       |
+| Asyncronous Spring MVC servlet with blocking HTTP clients     | `make run_async_apache_hc_client4` | HttpAsyncClient (Apache HC 4), blocking, but async |                                                                                                                                                                                  |
+| Asyncronous Spring MVC servlet (Spring's WebClient)           | `make run_async_webclient`         | WebClient, nonblocking                             |                                                                                                                                                                                  |
+| Spring Webflux                                                | `make run_webflux`                 | WebClient, nonblocking                             | graphql-java engine uses CompletableFutures internally and some translations to Mono/Flux are required. To avoid reinventing the (well build) wheel, Spring for Graphql is used. |
+| Blocking Spring MVC REST service                              | `make run_pors`                    | Feign (default), blocking                          | plain, old, restful, thread-per-request spring boot web app that returns (almost) the same data.                                                                                 |
