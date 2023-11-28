@@ -10,8 +10,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-    implementation 'org.springframework.cloud:spring-cloud-sleuth-autoconfigure'
+    implementation 'io.micrometer:micrometer-tracing'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.micrometer:context-propagation'
+    implementation 'io.zipkin.brave:brave-instrumentation-httpasyncclient'
+
+    implementation 'org.springframework.graphql:spring-graphql'
 
 
     implementation "com.graphql-java:graphql-java:$graphqlJavaVersion"

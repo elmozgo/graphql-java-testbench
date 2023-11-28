@@ -3,6 +3,8 @@ package com.arturkarwowski.testbench.graphql.asyncservlet.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import graphql.GraphQL;
+import graphql.execution.AsyncExecutionStrategy;
+import graphql.execution.instrumentation.tracing.TracingInstrumentation;
 import graphql.execution.preparsed.PreparsedDocumentEntry;
 import graphql.execution.preparsed.PreparsedDocumentProvider;
 import graphql.scalars.ExtendedScalars;
@@ -11,10 +13,13 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.micrometer.observation.ObservationRegistry;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.graphql.observation.GraphQlObservationInstrumentation;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.function.Function;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
@@ -25,6 +30,9 @@ public class GraphqlProvider {
     private final String schemaSdl;
 
     private GraphQL graphQL;
+
+    @Autowired
+    private ObservationRegistry observationRegistry;
 
     public GraphqlProvider(DataFetcherDefinitions dataFetcherDefinitions, String schemaSdl) {
         this.dataFetcherDefinitions = dataFetcherDefinitions;
@@ -37,6 +45,7 @@ public class GraphqlProvider {
 
         this.graphQL = GraphQL.newGraphQL(graphQLSchema)
                 .preparsedDocumentProvider(buildPreparsedDocumentProvider())
+                .instrumentation(new GraphQlObservationInstrumentation(observationRegistry))
                 .build();
     }
 

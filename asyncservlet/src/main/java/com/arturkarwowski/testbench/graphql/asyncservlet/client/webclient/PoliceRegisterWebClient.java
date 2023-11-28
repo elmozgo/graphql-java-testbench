@@ -19,26 +19,19 @@ public class PoliceRegisterWebClient implements PoliceRegisterClient {
 
     private final WebClient webClient;
 
-    private final String baseUrl;
-
     private final Executor tracingExecutor;
 
-    public PoliceRegisterWebClient(WebClient webClient, @Value("${http.client.police-register.url}") String baseUrl, Executor tracingExecutor) {
-        this.webClient = webClient;
-        this.baseUrl = baseUrl;
+    public PoliceRegisterWebClient(WebClient.Builder webClientBuilder, @Value("${http.client.police-register.url}") String baseUrl, Executor tracingExecutor) {
+        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
         this.tracingExecutor = tracingExecutor;
     }
 
     @Override
     public CompletableFuture<TrafficViolationsResponse> getTrafficViolations(String driverId) {
 
-        var uri = UriComponentsBuilder
-                .fromHttpUrl(baseUrl)
-                .pathSegment("driving-fines")
-                .queryParam("driverId", driverId)
-                .build().toUri();
-
-        return webClient.get().uri(uri)
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/driving-fines")
+                        .queryParam("driverId", driverId)
+                        .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchangeToMono(response -> response.bodyToMono(TrafficViolationsResponse.class))
                 .toFuture()

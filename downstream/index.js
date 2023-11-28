@@ -56,8 +56,7 @@ app.get('/fleet-manager/vehicles', (req, res) => {
   }
 
   logger.info(`fleet manager received request for ${response.vehicles.length} cars`,
-    { licencePlates: req.query.licencePlate },
-    extractTracing(req));
+    { licencePlates: req.query.licencePlate, ...extractTracing(req)});
 
   //simulated delay
   setTimeout(() => {

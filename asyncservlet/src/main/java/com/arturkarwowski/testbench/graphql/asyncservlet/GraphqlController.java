@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import io.micrometer.tracing.Tracer;
 import org.dataloader.DataLoaderRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,9 @@ public class GraphqlController {
     private final ObjectMapper objectMapper;
 
     private final DataLoaderRegistry dataLoaderRegistry;
+
+    @Autowired
+    Tracer tracer;
 
     public GraphqlController(GraphQL graphql, ObjectMapper objectMapper, DataLoaderRegistry dataLoaderRegistry) {
         this.graphql = graphql;
@@ -69,6 +73,9 @@ public class GraphqlController {
                 .operationName(operationName)
                 .variables(variables)
                 .build();
+
+        logger.debug(tracer.currentTraceContext().context().traceId());
+
         return this.graphql.executeAsync(executionInput).thenApply(ExecutionResult::toSpecification);
     }
 

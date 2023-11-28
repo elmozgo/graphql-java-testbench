@@ -4,6 +4,7 @@ import com.arturkarwowski.testbench.graphql.asyncservlet.client.FleetManagerClie
 import com.arturkarwowski.testbench.graphql.service.client.dto.VehiclesResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vavr.control.Try;
+import jakarta.annotation.PreDestroy;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -20,7 +21,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
